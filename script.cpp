@@ -8,7 +8,7 @@
 
 Adafruit_LiquidCrystal lcd(0);
 
-
+int frequencia;
 int tempSensor = A1; //colocando a entrada do TMP
 int sensorInput;
 double temp;
@@ -33,9 +33,9 @@ void setup()
   lcd.clear();//Limpa a tela
   lcd.setCursor(0, 0);//Posiciona o cursor na coluna 0, linha 0 
   Serial.begin(9600);//iniciando monitor serial
-  lcd.print("Sensor de temp.");
+  lcd.print("Sensor de temp.");//mostrar mensagem
   lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
-  lcd.print("e luminosidade");
+  lcd.print("e luminosidade");//mostrar mensagem
   pinMode(A1, INPUT);//configura o TMP como entrada
   pinMode(motorPin, OUTPUT);//configura o motor como entrada
 }
@@ -43,13 +43,11 @@ void setup()
 void loop()
 {
   pegarValores();//função que irá obter os valores dos sensores
+  condicoesPraga();//função que alertará o usuário, caso haja condições para praga
   verificarTemp();//função para verificar a temperatura
-  delay(1000);//espera 1 segundo
-  verificarLuz();//função que irá verificar a luminosidade
   delay(1000);//espera 1 segundo
   verificarUmidade();//função para verificar a umidade do solo
   delay(1000);//espera 1 segundo
-  condicoesPraga();//função que alertará o usuário, caso haja condições para praga
 }
 
 void pegarValores()
@@ -59,16 +57,16 @@ void pegarValores()
   //ver umidade do solo 
   umidadeBruto = analogRead(sensorSolo);//pega o valor da umidade da terra que estará entre 0 e 876
   umidadeSolo = map(umidadeBruto,0,876,0,100);//irá fazer os valores dos sensores irem de 0 a 100
-  Serial.print("Umidade do solo: ");
-  Serial.println(umidadeSolo);
+  Serial.print("Umidade do solo: ");//mostrar mensagem
+  Serial.println(umidadeSolo);//mostrar variavel
   
   
   //ver temp
   RawValue = analogRead(tempSensor);//recebe o valor do sensor
   Voltage = (RawValue / 1023.0) * 5000;//pega o valor da voltagem do sensor
   tempC = (Voltage-500) * 0.1;//transforma a voltagem em temepratura
-  Serial.print("Temperatura em C = ");
-  Serial.println(tempC,1);
+  Serial.print("Temperatura em C = ");//mostrar mensagem
+  Serial.println(tempC,1);//mostrar variavel
   delay(1000);//espera 1 segundo
 }
 
@@ -76,74 +74,67 @@ void verificarTemp()
 {
   if(tempC < 5)//irá alertar o usuário caso a temperatura esteja muito baixa
   {
-    noTone(altoFalante);//removerá o som do alarme
-    lcd.clear();
+    noTone(altoFalante);//Parar o alarme
+    lcd.clear();//Limpa a tela
     lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0
-    lcd.print("Temp. baixa");
+    lcd.print("Temp. baixa");//mostrar mensagem
     lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
-    lcd.print(tempC);
-    tone(altoFalante,1500);//tocar alarme a 1500 hertz
+    lcd.print(tempC);//mostrar variavel
     arrumar_fator();
   }
   else if(tempC > 25)//irá alertar o usuário caso a temperatura comece a ficar muito alta
   {
-    noTone(altoFalante);//removerá o som do alarme
-    lcd.clear();
+    noTone(altoFalante);///Parar o alarme
+    lcd.clear();//Limpa a tela
     lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0 
-    lcd.print("Temp. alta");
+    lcd.print("Temp. alta");//mostrar mensagem
     lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
-    lcd.print(tempC);
-    tone(altoFalante,2000);//tocar alarme a 2000 hertz
+    lcd.print(tempC);//mostrar variavel
     arrumar_fator();  
   }
     else //indicará que a temperatura está normal
   {
-    noTone(altoFalante);//removerá o som do alarme
-    lcd.clear();
+    noTone(altoFalante);//Parar o alarme
+    lcd.clear();//Limpa a tela
     lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0 
-    lcd.print("Temp. OK");
+    lcd.print("Temp. OK");//mostrar mensagem
     lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
-    lcd.print(tempC);
+    lcd.print(tempC);//mostrar variavel
   }
 }
 
 void verificarUmidade()
 {
-  if(umidadeSolo < 60)
+  if(umidadeSolo < 50)
   {
-    noTone(altoFalante);//removerá o som do alarme
+    noTone(altoFalante);//Parar o alarme
     lcd.clear();//Limpa a tela
     lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0 
-    lcd.print("Solo seco");
+    lcd.print("Solo seco");//mostrar mensagem
     lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
     lcd.print(umidadeSolo);//mostra a porcentagem de umidade no display
     delay(1000);//espera 1 segundo
-    lcd.clear();//Limpa a tela
-    lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0 
-    lcd.print("Ligando motor");
     digitalWrite(motorPin,LOW);//mostra a porcentagem de umidade no display
-    tone(altoFalante,1000);//tocar alarme a 1000 hertz
     arrumar_fator();
   }
-  else if(umidadeSolo > 70)
+  else if(umidadeSolo > 80)
   {
-    noTone(altoFalante);//removerá o som do alarme
-    digitalWrite(motorPin,HIGH);
-    lcd.clear();
+    noTone(altoFalante);//Parar o alarme
+    digitalWrite(motorPin,HIGH);//Desliga o motor
+    lcd.clear();//Limpa a tela
     lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0 
-    lcd.print("Solo umido");
+    lcd.print("Solo umido");//mostrar mensagem
     lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
     lcd.print(umidadeSolo);//mostra a porcentagem de umidade no display
-    tone(altoFalante,2500);//tocar alarme a 2500 hertz
     arrumar_fator();
   }
   else
   {
-    noTone(altoFalante);//removerá o som do alarme
-    digitalWrite(motorPin,HIGH);
+    noTone(altoFalante);//Parar o alarme
+    digitalWrite(motorPin,HIGH);//Desliga o motor
     lcd.clear();//Limpa a tela
     lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0 
-    lcd.print("Solo OK");
+    lcd.print("Solo OK");//mostrar mensagem
     lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
     lcd.print(umidadeSolo);//mostra a porcentagem de umidade no display
   }
@@ -152,13 +143,12 @@ void condicoesPraga()
 {
   if(tempC > 25 && umidadeSolo > 70)
   {
-    noTone(altoFalante);//removerá o som do alarme
+    noTone(altoFalante);//Parar o alarme
     lcd.clear();//Limpa a tela
     lcd.setCursor(0,0);//Posiciona o cursor na coluna 0, linha 0 
-    lcd.print("Aviso:");
+    lcd.print("Aviso:");//mostrar mensagem
     lcd.setCursor(0,1);//Posiciona o cursor na coluna 0, linha 1
-    lcd.print("Perigo de praga");
-    tone(altoFalante,3000);
+    lcd.print("Propenso a praga");//mostrar mensagem
     arrumar_fator();
   }
 }
@@ -166,12 +156,16 @@ void arrumar_fator()//essa função irá servir para que o alarme continue tocan
 {
   while(tempC > 25 || tempC < 5 || umidadeSolo < 60 || umidadeSolo > 70)
   {
-    umidadeBruto = analogRead(sensorSolo);
-    umidadeSolo = map(umidadeBruto,0,876,0,100);
-    tempC = (Voltage-500) * 0.1;
-    Serial.print("Umidade do solo: ");
-  	Serial.println(umidadeSolo);
-    Serial.print("Temperatura em C = ");
-  	Serial.println(tempC,1);
+    umidadeBruto = analogRead(sensorSolo);//Atualizar valores
+    umidadeSolo = map(umidadeBruto,0,876,0,100);//Atualizar valores
+    tempC = (Voltage-500) * 0.1;//Atualizar valores
+    Serial.print("Umidade do solo: ");//mostrar mensagem
+  	Serial.println(umidadeSolo);//mostrar variavel
+    Serial.print("Temperatura em C = ");//mostrar mensagem
+  	Serial.println(tempC,1);//mostrar variavel
+    tone(altoFalante,1000);//tocar alarme a 1000 hertz
+    delay(2000);//esperar 2 segundos
+    noTone(altoFalante);//Parar o alarme
+    delay(10000);//esperar 10 segundos
   }
 }
